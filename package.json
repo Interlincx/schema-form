@@ -1,0 +1,14 @@
+{
+  "name": "schema-form",
+  "version": "0.0.0",
+  "description": "turn a json schema into form fields",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tyler Bushnell <wunderlinks@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "formbuilder": "0.0.0"
+  }
+}
