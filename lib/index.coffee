@@ -15,6 +15,7 @@ class SimpleFormify
       if opts.whitelist?
         whitelist = opts.whitelist
       struct = @organizeSections opts.schema, whitelist
+    console.log struct
 
     defaultOpts =
       schema:{}
@@ -22,20 +23,36 @@ class SimpleFormify
       fields:[]
       className:''
 
-    result = @buildSection struct
+    values = {}
+    if opts.values?
+      values = opts.values
+    result = @build struct, values
     console.log "FRM RESULT", result
     return result
 
-  buildSection: (struct) ->
+  build: (struct, values) ->
+    if struct.title?
+      result = @buildSection struct, values
+    else
+      result = @buildForm struct, values
+
+  buildSection: (struct, values) ->
     for section in struct
       sectHolder = document.createElement 'div'
       if section.title?
         title = document.createElement 'h2'
         title.innerHTML = section.title
         sectHolder.appendChild title
-      for field in section.fields
-        sectHolder.appendChild @formifyField field
+      sectHolder.appendChild @buildForm section.fields, values
     return sectHolder
+
+  buildForm: (fields, values) ->
+    formHolder = document.createElement 'div'
+    for field in fields
+      if values[field.name]?
+        field.value = values[field.name]
+      formHolder.appendChild @formifyField field
+    return formHolder
         
 
   organizeSections: (schema, whitelist=[]) ->
@@ -52,9 +69,12 @@ class SimpleFormify
   organizeSchema: (schema, whitelist=[]) ->
     struct = []
     if whitelist.length > 0
-      for handle in whitelist
-        data = schema[handle]
-        data.name = handle
+      for handle, i in whitelist
+        if typeof handle is "object"
+          data = handle
+        else
+          data = schema[handle]
+          data.name = handle
         struct.push data
     else
       for handle, data of schema
@@ -70,7 +90,7 @@ class SimpleFormify
       holder.className = hsettings.class
 
     label = document.createElement 'label'
-    label.innerHTML settings.title
+    label.innerHTML = settings.title
     if settings.required? and settings.required is true
       label.className 'required'
     holder.appendChild label
@@ -89,21 +109,21 @@ class SimpleFormify
           settings.tooltip
     ###
 
-    edit = true
-    if settings.edit?
-      edit = settings.edit
+    readonly = false
+    if settings.readonly?
+      readonly = settings.readonly
 
-    if edit
-      input = @buildInput settings
-    else
+    if readonly
       if typeof settings.options != 'undefined'
         @value = settings.options[@value]
       input = @buildHidden settings
 
-      static = document.createElement 'span'
+      displayText = document.createElement 'span'
       if settings.value?
-        static.innerHTML settings.value
-      holder.appendChild static
+        displayText.innerHTML = settings.value
+      holder.appendChild displayText
+    else
+      input = @buildInput settings
 
     if settings.class?
       input.className = settings.class
@@ -122,7 +142,6 @@ class SimpleFormify
       when 'text', 'blob'
         input = @buildTextarea settings
       when 'bitflag', 'boolean'
-        label.addClass 'checkbox'
         input = @buildCheckbox settings
       when 'select'
         input = @buildSelect settings
@@ -150,7 +169,7 @@ class SimpleFormify
     input.type = 'checkbox'
  
     if settings.value is '1' or settings.value is 1
-      input.value = 'checked'
+      input.checked = 'checked'
     return input
 
   buildText: (settings) ->
