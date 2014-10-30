@@ -27,41 +27,37 @@ class SimpleFormify
     if opts.values?
       values = opts.values
     result = @build struct, values
-    console.log "FRM RESULT", result
     return result
 
-  build: (struct, values) ->
-    if struct.title?
-      result = @buildSection struct, values
-    else
-      result = @buildForm struct, values
+  build: (struct, values, section) ->
+    holder = document.createElement 'div'
+    for item in struct
+      if item.section?
+        holder.appendChild @buildSection item, values
+      else
+        if values[item.name]?
+          item.value = values[item.name]
+        holder.appendChild @formifyField item, section
+    return holder
 
-  buildSection: (struct, values) ->
-    for section in struct
-      sectHolder = document.createElement 'div'
-      if section.title?
-        title = document.createElement 'h2'
-        title.innerHTML = section.title
-        sectHolder.appendChild title
-      sectHolder.appendChild @buildForm section.fields, values
+  buildSection: (section, values) ->
+    sectHolder = document.createElement 'div'
+    if section.title?
+      title = document.createElement 'h2'
+      title.innerHTML = section.title
+      sectHolder.appendChild title
+    sectHolder.appendChild @build section.fields, values, section
     return sectHolder
 
-  buildForm: (fields, values) ->
-    formHolder = document.createElement 'div'
-    for field in fields
-      if values[field.name]?
-        field.value = values[field.name]
-      formHolder.appendChild @formifyField field
-    return formHolder
-        
 
   organizeSections: (schema, whitelist=[]) ->
-    if whitelist.length > 0
-      if typeof whitelist[0] is 'string'
-        struct = @organizeSchema schema, whitelist
-      else
-        for section in whitelist
-          section.fields = @organizeSchema schema, section.fields
+    if typeof whitelist is 'object'
+      struct = []
+      for section in whitelist
+        section.fields = @organizeSchema schema, section.fields
+        struct.push section
+    else if typeof whitelist is 'array'
+      struct = @organizeSchema schema, whitelist
     else
       struct = @organizeSchema schema
     return struct
@@ -71,7 +67,12 @@ class SimpleFormify
     if whitelist.length > 0
       for handle, i in whitelist
         if typeof handle is "object"
-          data = handle
+          if schema[handle.name]?
+            data = schema[handle.name]
+            for prop, val of handle
+              data[prop] = val
+          else
+            data = handle
         else
           data = schema[handle]
           data.name = handle
@@ -82,12 +83,12 @@ class SimpleFormify
         struct.push data
     return struct
 
-  formifyField: (settings, hsettings={}) ->
+  formifyField: (settings, section={}) ->
     console.log 'formify!'
 
     holder = document.createElement 'div'
-    if hsettings.class?
-      holder.className = hsettings.class
+    if section.fieldClass?
+      holder.className = section.fieldClass
 
     label = document.createElement 'label'
     label.innerHTML = settings.title
