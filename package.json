@@ -8,7 +8,15 @@
   },
   "author": "Tyler Bushnell <wunderlinks@gmail.com>",
   "license": "ISC",
+  "browserify": {
+    "transform": [
+      "coffeeify"
+    ]   
+  },  
+  "devDependencies": {
+    "browserify": "~2.35.1"
+  },
   "dependencies": {
-    "formbuilder": "0.0.0"
+    "coffeeify": "~0.5.2"
   }
 }
