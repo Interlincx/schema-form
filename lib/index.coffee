@@ -87,13 +87,13 @@ class SimpleFormify
     console.log 'formify!'
 
     holder = document.createElement 'div'
-    if section.fieldClass?
-      holder.className = section.fieldClass
+    if section.holderClass?
+      holder.className = section.holderClass
 
     label = document.createElement 'label'
     label.innerHTML = settings.title
     if settings.required? and settings.required is true
-      label.className 'required'
+      label.className = 'required'
     holder.appendChild label
 
     ###
@@ -126,8 +126,10 @@ class SimpleFormify
     else
       input = @buildInput settings
 
+    if section.fieldClass?
+      input.className += section.fieldClass
     if settings.class?
-      input.className = settings.class
+      input.className += settings.class
     holder.appendChild input
 
     return holder
@@ -151,6 +153,8 @@ class SimpleFormify
   
     for handle, value of settings.attributes
       input.setAttribute handle.replace(/_/g, '-'), value
+
+    input.name = settings.name
 
     if settings.value?
       input.value = settings.value
