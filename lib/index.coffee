@@ -136,20 +136,23 @@ class SimpleFormify
 
 
   buildInput: (settings) ->
-    switch settings.type
-      when 'hidden'
-        input = @buildHidden settings
-        return input
-      when 'time', 'date', 'datetime'
-        input = @buildPicker settings
-      when 'text', 'blob'
-        input = @buildTextarea settings
-      when 'bitflag', 'boolean'
-        input = @buildCheckbox settings
-      when 'select'
-        input = @buildSelect settings
-      else
-        input = @buildText settings
+    if settings.options?
+      input = @buildSelect settings
+    else
+      switch settings.type
+        when 'hidden'
+          input = @buildHidden settings
+          return input
+        when 'time', 'date', 'datetime'
+          input = @buildPicker settings
+        when 'text', 'blob'
+          input = @buildTextarea settings
+        when 'bitflag', 'boolean'
+          input = @buildCheckbox settings
+        when 'select'
+          input = @buildSelect settings
+        else
+          input = @buildText settings
   
     for handle, value of settings.attributes
       input.setAttribute handle.replace(/_/g, '-'), value
