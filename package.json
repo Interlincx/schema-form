@@ -1,6 +1,6 @@
 {
   "name": "schema-form",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "turn a json schema into form fields",
   "main": "index.js",
   "scripts": {
@@ -11,8 +11,8 @@
   "browserify": {
     "transform": [
       "coffeeify"
-    ]   
-  },  
+    ]
+  },
   "devDependencies": {
     "browserify": "~2.35.1"
   },
