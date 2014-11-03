@@ -126,10 +126,13 @@ class SimpleFormify
     else
       input = @buildInput settings
 
+    classes = []
     if section.fieldClass?
-      input.className += section.fieldClass
+      classes.push section.fieldClass
     if settings.class?
-      input.className += settings.class
+      classes.push settings.class
+    if classes.length > 0
+      input.className = classes.join ' '
     holder.appendChild input
 
     return holder
