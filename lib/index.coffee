@@ -204,10 +204,11 @@ class SimpleFormify
     input = document.createElement 'select'
     input.type = 'text'
 
-    for option, value of settings.options
+    for val, title of settings.options
       option = document.createElement 'option'
-      option.innerHTML = value
-      if settings.value is value
+      option.innerHTML = title
+      option.value = val
+      if settings.value is val
         option.selected = true
       input.appendChild option
 
