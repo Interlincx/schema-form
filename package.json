@@ -1,6 +1,6 @@
 {
   "name": "schema-form",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "turn a json schema into form fields",
   "main": "index.js",
   "scripts": {
