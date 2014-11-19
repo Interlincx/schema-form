@@ -5,8 +5,6 @@ module.exports = ->
 	return simpleFormify
 
 class SimpleFormify
-  constructor: ->
-    console.log 'sf instantiated'
 
   formifyGroup: (opts) ->
     struct = opts.struct
@@ -35,9 +33,10 @@ class SimpleFormify
       if item.section?
         holder.appendChild @buildSection item, values
       else
+        value = ''
         if values[item.name]?
-          item.value = values[item.name]
-        holder.appendChild @formifyField item, section
+          value = values[item.name]
+        holder.appendChild @formifyField item, value, section
     return holder
 
   buildSection: (section, values) ->
@@ -60,6 +59,7 @@ class SimpleFormify
       struct = @organizeSchema schema, whitelist
     else
       struct = @organizeSchema schema
+    console.log "SCH", schema
     return struct
 
   organizeSchema: (schema, whitelist=[]) ->
@@ -83,7 +83,7 @@ class SimpleFormify
         struct.push data
     return struct
 
-  formifyField: (settings, section={}) ->
+  formifyField: (settings, value, section={}) ->
     console.log 'formify!'
 
     holder = document.createElement 'div'
@@ -116,15 +116,15 @@ class SimpleFormify
 
     if readonly
       if typeof settings.options != 'undefined'
-        @value = settings.options[@value]
-      input = @buildHidden settings
+        value = settings.options[value]
+      input = @buildHidden settings, value
 
       displayText = document.createElement 'span'
-      if settings.value?
-        displayText.innerHTML = settings.value
+      if value?
+        displayText.innerHTML = value
       holder.appendChild displayText
     else
-      input = @buildInput settings
+      input = @buildInput settings, value
 
     classes = []
     if section.fieldClass?
@@ -138,7 +138,7 @@ class SimpleFormify
     return holder
 
 
-  buildInput: (settings) ->
+  buildInput: (settings, value) ->
     if settings.options?
       input = @buildSelect settings
     else
@@ -162,33 +162,33 @@ class SimpleFormify
 
     input.name = settings.name
 
-    if settings.value?
-      input.value = settings.value
+    if value?
+      input.value = value
     return input
 
-  buildPicker: (settings) ->
+  buildPicker: (settings, value) ->
     return @buildText settings
 
 
-  buildHidden: (settings) ->
+  buildHidden: (settings, value) ->
     input = document.createElement 'input'
     input.type = 'hidden'
     return input
 
-  buildCheckbox: (settings) ->
+  buildCheckbox: (settings, value) ->
     input = document.createElement 'input'
     input.type = 'checkbox'
  
-    if settings.value is '1' or settings.value is 1
+    if value is '1' or value is 1
       input.checked = 'checked'
     return input
 
-  buildText: (settings) ->
+  buildText: (settings, value) ->
     input = document.createElement 'input'
     input.type = 'text'
     return input
 
-  buildTextarea: (settings) ->
+  buildTextarea: (settings, value) ->
     input = document.createElement 'textarea'
 
     rows = 8
@@ -200,7 +200,7 @@ class SimpleFormify
     input.cols = cols
     return input
 
-  buildSelect: (settings) ->
+  buildSelect: (settings, value) ->
     input = document.createElement 'select'
     input.type = 'text'
 
@@ -208,7 +208,7 @@ class SimpleFormify
       option = document.createElement 'option'
       option.innerHTML = title
       option.value = val
-      if settings.value is val
+      if value is val
         option.selected = true
       input.appendChild option
 
