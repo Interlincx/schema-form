@@ -17,6 +17,7 @@
     "browserify": "~2.35.1"
   },
   "dependencies": {
-    "coffeeify": "~0.5.2"
+    "coffeeify": "~0.5.2",
+    "pikaday": "^1.2.0"
   }
 }
