@@ -10,7 +10,8 @@
   "license": "ISC",
   "browserify": {
     "transform": [
-      "coffeeify"
+      "coffeeify",
+      "cssify"
     ]
   },
   "devDependencies": {
@@ -18,6 +19,7 @@
   },
   "dependencies": {
     "coffeeify": "~0.5.2",
+    "cssify": "^0.6.0",
     "pikaday": "^1.2.0"
   }
 }

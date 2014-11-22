@@ -1,4 +1,6 @@
 
+pika = require 'pikaday'
+require './pikaday.css'
 
 module.exports = ->
 	simpleFormify = new SimpleFormify()
@@ -167,7 +169,12 @@ class SimpleFormify
     return input
 
   buildPicker: (settings, value) ->
-    return @buildText settings
+    field = @buildText settings
+    picker = new pika
+      field: field
+      onSelect: (date) ->
+        field.value = picker.toString()
+    return field
 
 
   buildHidden: (settings, value) ->
