@@ -7,6 +7,7 @@ module.exports = ->
 	return simpleFormify
 
 class SimpleFormify
+  opts: {}
 
   formifyGroup: (opts) ->
     struct = opts.struct
@@ -15,13 +16,14 @@ class SimpleFormify
       if opts.whitelist?
         whitelist = opts.whitelist
       struct = @organizeSections opts.schema, whitelist
-    console.log struct
 
     defaultOpts =
       schema:{}
       values:{}
       fields:[]
       className:''
+
+    @opts = opts
 
     values = {}
     if opts.values?
@@ -31,6 +33,7 @@ class SimpleFormify
 
   build: (struct, values, section) ->
     holder = document.createElement 'div'
+    console.log 'STRUCT', struct
     for item in struct
       if item.section?
         holder.appendChild @buildSection item, values
@@ -52,16 +55,17 @@ class SimpleFormify
 
 
   organizeSections: (schema, whitelist=[]) ->
-    if typeof whitelist is 'object'
+    console.log 'white', typeof whitelist
+    console.log 'whitelist', whitelist
+    if whitelist.fields?
       struct = []
       for section in whitelist
         section.fields = @organizeSchema schema, section.fields
         struct.push section
-    else if typeof whitelist is 'array'
+    else if typeof whitelist[0]?
       struct = @organizeSchema schema, whitelist
     else
       struct = @organizeSchema schema
-    console.log "SCH", schema
     return struct
 
   organizeSchema: (schema, whitelist=[]) ->
@@ -86,7 +90,6 @@ class SimpleFormify
     return struct
 
   formifyField: (settings, value, section={}) ->
-    console.log 'formify!'
 
     holder = document.createElement 'div'
     if section.holderClass?
@@ -133,6 +136,8 @@ class SimpleFormify
       classes.push section.fieldClass
     if settings.class?
       classes.push settings.class
+    if @opts.className?
+      classes.push @opts.className
     if classes.length > 0
       input.className = classes.join ' '
     holder.appendChild input
