@@ -9,6 +9,23 @@ module.exports = ->
 class SimpleFormify
   opts: {}
 
+  formify: (opts) ->
+    @opts = opts
+    set = @organizeSchema opts.schema, opts.fields
+
+    result = []
+    for item in set
+      value = ''
+      if opts.values[item.name]?
+        value = opts.values[item.name]
+
+      result.push @buildField item, value
+
+    @form = result
+
+    return result
+
+
   formifyGroup: (opts) ->
     struct = opts.struct
     if opts.schema?
@@ -33,7 +50,6 @@ class SimpleFormify
 
   build: (struct, values, section) ->
     holder = document.createElement 'div'
-    console.log 'STRUCT', struct
     for item in struct
       if item.section?
         holder.appendChild @buildSection item, values
@@ -55,8 +71,6 @@ class SimpleFormify
 
 
   organizeSections: (schema, whitelist=[]) ->
-    console.log 'white', typeof whitelist
-    console.log 'whitelist', whitelist
     if whitelist.fields?
       struct = []
       for section in whitelist
@@ -90,17 +104,26 @@ class SimpleFormify
     return struct
 
   formifyField: (settings, value, section={}) ->
-
     holder = document.createElement 'div'
     if section.holderClass?
       holder.className = section.holderClass
 
+    field = @buildField settings, value, section
+
+    holder.appendChild field.label
+    holder.appendChild field.input
+
+    return holder
+
+
+  buildField: (settings, value, section={}) ->
     label = document.createElement 'label'
     label.innerHTML = settings.title
+    label.className = 'sf-label-'+settings.name
     if settings.required? and settings.required is true
-      label.className = 'required'
-    holder.appendChild label
+      label.classList.add 'required'
 
+    holder = document.createElement 'div'
     ###
     if settings.tooltip?
       tt = document.createElement 'div'
@@ -116,8 +139,12 @@ class SimpleFormify
     ###
 
     readonly = false
+    if settings.client_editable?
+      readonly = !settings.client_editable
     if settings.readonly?
       readonly = settings.readonly
+    if @opts.readonly?
+      readonly = @opts.readonly
 
     if readonly
       if typeof settings.options != 'undefined'
@@ -131,7 +158,7 @@ class SimpleFormify
     else
       input = @buildInput settings, value
 
-    classes = []
+    classes = ['sf-vh']
     if section.fieldClass?
       classes.push section.fieldClass
     if settings.class?
@@ -140,9 +167,15 @@ class SimpleFormify
       classes.push @opts.className
     if classes.length > 0
       input.className = classes.join ' '
+
     holder.appendChild input
 
-    return holder
+    result =
+      settings:settings
+      label:label
+      input:holder
+
+    return result
 
 
   buildInput: (settings, value) ->
@@ -225,4 +258,33 @@ class SimpleFormify
       input.appendChild option
 
     return input
+
+  getValues: ->
+    values = {}
+    for item in @form
+      readonly = false
+      if item.settings.client_editable?
+        readonly = !item.settings.client_editable
+      if item.settings.readonly?
+        readonly = item.settings.readonly
+      if @opts.readonly?
+        readonly = @opts.readonly
+
+      if readonly
+        continue
+
+      inp = item.input.querySelector '.sf-vh'
+
+      switch item.settings.type
+        when 'bitflag', 'boolean'
+          val = 0
+          if inp.checked
+            val = 1
+        else
+          val = inp.value
+      values[item.settings.name] = val
+
+    return values
+
+
 
