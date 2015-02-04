@@ -2,12 +2,11 @@
 pika = require 'pikaday'
 require './pikaday.css'
 
-module.exports = ->
-	simpleFormify = new SimpleFormify()
-	return simpleFormify
 
 class SimpleFormify
-  opts: {}
+  constructor: (opts) ->
+    @opts = opts
+    @form = []
 
   formify: (opts) ->
     @opts = opts
@@ -20,8 +19,6 @@ class SimpleFormify
         value = opts.values[item.name]
 
       result.push @buildField item, value
-
-    @form = result
 
     return result
 
@@ -175,6 +172,8 @@ class SimpleFormify
       label:label
       input:holder
 
+    @form.push result
+
     return result
 
 
@@ -287,4 +286,4 @@ class SimpleFormify
     return values
 
 
-
+module.exports = SimpleFormify
