@@ -155,7 +155,7 @@ class SimpleFormify
     else
       input = @buildInput settings, value
 
-    classes = ['sf-vh']
+    classes = []
     if section.fieldClass?
       classes.push section.fieldClass
     if settings.class?
@@ -272,15 +272,18 @@ class SimpleFormify
       if readonly
         continue
 
-      inp = item.input.querySelector '.sf-vh'
+      inp = item.input.querySelector '[name="'+item.settings.name+'"]'
+      console.log 'INP', inp
 
+      val = ''
       switch item.settings.type
         when 'bitflag', 'boolean'
           val = 0
           if inp.checked
             val = 1
         else
-          val = inp.value
+          if inp?.value
+            val = inp.value
       values[item.settings.name] = val
 
     return values
