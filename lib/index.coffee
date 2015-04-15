@@ -273,6 +273,8 @@ class SimpleFormify
         continue
 
       inp = item.input.querySelector '[name="'+item.settings.name+'"]'
+      if !inp
+        continue
       console.log 'INP', inp
 
       val = ''
