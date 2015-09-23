@@ -195,6 +195,9 @@ class SimpleFormify
           input = @buildSelect settings, value
         else
           input = @buildText settings, value
+
+    if settings.onChange
+      input.onchange = settings.onChange
   
     for handle, setting of settings.attributes
       input.setAttribute handle.replace(/_/g, '-'), setting
